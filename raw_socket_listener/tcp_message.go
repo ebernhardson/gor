@@ -100,19 +100,14 @@ func (t *TCPMessage) IsMultipart() bool {
 	m := payload[:4]
 
 	if t.IsIncoming {
-		// If one GET, OPTIONS, or HEAD request
-		if bytes.Equal(m, []byte("GET ")) || bytes.Equal(m, []byte("OPTI")) || bytes.Equal(m, []byte("HEAD")) {
-			return false
-		} else {
-			// Sometimes header comes after the body :(
-			if bytes.Equal(m, []byte("POST")) || bytes.Equal(m, []byte("PUT ")) || bytes.Equal(m, []byte("PATC")) {
-				if length := proto.Header(payload, []byte("Content-Length")); len(length) > 0 {
-					l, _ := strconv.Atoi(string(length))
+		// Sometimes header comes after the body :(
+		if bytes.Equal(m, []byte("POST")) || bytes.Equal(m, []byte("PUT ")) || bytes.Equal(m, []byte("PATC")) {
+			if length := proto.Header(payload, []byte("Content-Length")); len(length) > 0 {
+				l, _ := strconv.Atoi(string(length))
 
-					// If content-length equal current body length
-					if l > 0 && l == t.Size() {
-						return false
-					}
+				// If content-length equal current body length
+				if l > 0 && l == t.Size() {
+					return false
 				}
 			}
 		}

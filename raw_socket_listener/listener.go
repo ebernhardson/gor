@@ -188,6 +188,7 @@ func (t *Listener) isValidPacket(buf []byte) bool {
 
 var bExpect100ContinueCheck = []byte("Expect: 100-continue")
 var bPOST = []byte("POST")
+var bGET = []byte("GET")
 
 // Trying to add packet to existing message or creating new message
 //
@@ -219,7 +220,7 @@ func (t *Listener) processTCPPacket(packet *TCPPacket) {
 		responseRequest, _ = t.respAliases[packet.Ack]
 	}
 
-	mID := packet.Addr.String() + strconv.Itoa(int(packet.DestPort)) + strconv.Itoa(int(packet.Ack))
+	mID := packet.Addr.String() + strconv.Itoa(int(packet.DestPort)) + strconv.Itoa(int(packet.SrcPort))
 
 	message, ok := t.messages[mID]
 
@@ -234,7 +235,8 @@ func (t *Listener) processTCPPacket(packet *TCPPacket) {
 	}
 
 	// Handling Expect: 100-continue requests
-	if len(packet.Data) > 4 && bytes.Equal(packet.Data[0:4], bPOST) {
+	if (len(packet.Data) > 4 && bytes.Equal(packet.Data[0:4], bPOST)) ||
+	   (len(packet.Data) > 3 && bytes.Equal(packet.Data[0:4], bGET)) {
 		// reading last 20 bytes (not counting CRLF): last header value (if no body presented)
 		if bytes.Equal(packet.Data[len(packet.Data)-24:len(packet.Data)-4], bExpect100ContinueCheck) {
 			t.seqWithData[packet.Seq+uint32(len(packet.Data))] = packet.Ack
