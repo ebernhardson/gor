@@ -39,6 +39,7 @@ type AppSettings struct {
 	outputTCPStats bool
 
 	inputFile  MultiOption
+	inputFileRepeat uint
 	outputFile MultiOption
 
 	inputRAW MultiOption
@@ -78,6 +79,7 @@ func init() {
 	flag.BoolVar(&Settings.outputTCPStats, "output-tcp-stats", false, "Report TCP output queue stats to console every 5 seconds.")
 
 	flag.Var(&Settings.inputFile, "input-file", "Read requests from file: \n\tgor --input-file ./requests.gor --output-http staging.com")
+	flag.UintVar(&Settings.inputFileRepeat, "input-file-repeat", 1, "Repeat the input file n times: \n\tgor --input-file ./requests.gor --input-file-repeat 4 --output-http staging.com")
 	flag.Var(&Settings.outputFile, "output-file", "Write incoming requests to file: \n\tgor --input-raw :80 --output-file ./requests.gor")
 
 	flag.Var(&Settings.inputRAW, "input-raw", "Capture traffic from given port (use RAW sockets and require *sudo* access):\n\t# Capture traffic from 8080 port\n\tgor --input-raw :8080 --output-http staging.com")
